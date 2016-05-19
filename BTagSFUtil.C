@@ -226,7 +226,7 @@ float BTagSFUtil::GetJetSF(int JetFlavor, float JetPt, float JetEta) {
   int JetFlavorFlag = 2;
   if (abs(JetFlavor)==4) JetFlavorFlag = 1;
   else if (abs(JetFlavor)==5) JetFlavorFlag = 0;
-
+ 
   if (JetPt<MinJetPt[JetFlavorFlag][iTagger])
     ThisJetPt = MinJetPt[JetFlavorFlag][iTagger];
 

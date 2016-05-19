@@ -398,7 +398,8 @@ double BTagCalibrationReader::evaluate(BTagEntry::JetFlavor jf,
     }
   }
 
-  return 0.;  // default value
+  //return 0.;  // default value
+  return 1.; // test
 
 }
 
