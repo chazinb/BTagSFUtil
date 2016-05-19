@@ -2,7 +2,8 @@
 #include "../FastSimCorrectionFactors/Summer12.C"
 
 string CampaignName = "Run2015_76X";
-string FastSimCampaignName = "Run2015_74X";
+
+string LightMeasurementType = "incl";
 
 float AbsoluteMinJetPt = 20.;
 

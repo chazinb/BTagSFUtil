@@ -34,23 +34,23 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
     TaggerOP += "L";
     TaggerCut = TaggerWP[iTagger][0];
     reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "incl",          SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, LightMeasurementType,          SystematicFlagL);
     reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "incl",          "central");
+    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, LightMeasurementType, "central");
   } else if (OperatingPoint=="Medium")  {
     TaggerOP += "M";
     TaggerCut = TaggerWP[iTagger][1];
     reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "incl", SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, LightMeasurementType, SystematicFlagL);
     reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "incl",          "central");
+    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, LightMeasurementType, "central");
   } else if (OperatingPoint=="Tight")  {
     TaggerOP += "T";
     TaggerCut = TaggerWP[iTagger][2];
     reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, "incl", SystematicFlagL);
+    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, LightMeasurementType, SystematicFlagL);
     reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, "incl",          "central");
+    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, LightMeasurementType, "central");
   } 
 
   if (TaggerCut==-999.) 
@@ -69,7 +69,7 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
     for (int idt = 0; idt<nFastSimDatasets; idt++)
       if (FastSimDataset==FastSimDatasetName[idt]) FastSimName = FastSimDatasetName[idt];
     
-    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + FastSimCampaignName + "/" + BTagAlgorithm + FastSimName + ".csv";
+    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + CampaignName + "/" + BTagAlgorithm + FastSimName + ".csv";
     BTagCalibration fastsimcalib(BTagAlgorithm, FastSimCSVFileName);
     
     string FastSimSystematicFlagB = "central";
