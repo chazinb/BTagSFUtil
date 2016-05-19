@@ -3,6 +3,8 @@ be used only for the same MC samples or for events with similar topology */
 
 float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
 
+  if (JetPt>=300.) JetPt = 299.;
+
   if (TaggerOP=="cMVAv2L") {
     if (JetPt>20.0 && JetPt<30.0 && fabs(JetEta)<0.8) return  0.815795004368;
     if (JetPt>30.0 && JetPt<60.0 && fabs(JetEta)<0.8) return  0.886824786663;
@@ -167,6 +169,8 @@ if (JetPt>90.0 && JetPt<120.0 && fabs(JetEta)>=1.6 && fabs(JetEta)<2.4) return  
 
 float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 
+  if (JetPt>=300.) JetPt = 299.;
+
   if (TaggerOP=="cMVAv2L") {
     if (JetPt>20.0 && JetPt<30.0 && fabs(JetEta)<0.8) return  0.356370925903;
     if (JetPt>30.0 && JetPt<60.0 && fabs(JetEta)<0.8) return  0.390322744846;
@@ -328,6 +332,8 @@ float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 
 
 float BTagSFUtil::TagEfficiencyLight(float JetPt, float JetEta) {
+
+  if (JetPt>=300.) JetPt = 299.;
 
   if (TaggerOP=="cMVAv2L") {
     if (JetPt>20.0 && JetPt<30.0 && fabs(JetEta)<0.8) return  0.0866834297776;
