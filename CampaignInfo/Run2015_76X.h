@@ -1,5 +1,5 @@
 #include "../BTagEfficiencies/Fall15TTbar.C"
-#include "../FastSimCorrectionFactors/Summer12.C"
+//#include "../FastSimCorrectionFactors/Summer12.C"
 
 string CampaignName = "Run2015_76X";
 
