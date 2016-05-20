@@ -1,6 +1,12 @@
 # BTagSFUtil
 /*************************************************************
 
+Getting the code:
+
+ - git clone https://github.com/scodella/BTagSFUtil
+ 
+ - include BTagSFUtil.C in your code
+
 Class Usage:
 
  - BTagSFUtil *BTagSF = new BTagSFUtil(MeasurementType, BTagAlgorithm, OperatingPoint, SystematicIndex);
@@ -35,6 +41,6 @@ Class Usage:
 
          Where: DiscriminatorValue is the value for the discriminant of your choise for the jet to which the SF has being applied
  
-      Important note: this method to apply the SFs is designed in order to make a minimal use of absolute b-tag efficiencies. Nevertheless, when the SFs a re larger than 1, those efficiencies must be computed in the very MC samples on which the SFs have being applied. The BTagEfficienciesTTbarSummer12.C file provide the efficiencies for a ttbar Summer12 samples only for example purposes only.
+      Important note: the method IsTagged is designed in order to make a minimal use of absolute b-tag efficiencies. Nevertheless, when the SFs a re larger than 1, those efficiencies must be computed in the very MC samples on which the SFs have being applied. The BTagEfficiencies/*.C files provide the efficiencies for some ttbar samples for example purposes only.
 
 *************************************************************/
