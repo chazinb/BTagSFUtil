@@ -1,7 +1,7 @@
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
 #include "BTagSFUtil.h"
 #include "BTagCalibrationStandalone.cc"
-#include "CampaignInfo/Run2015_76X.h"
+#include "CampaignInfo/Run2015_74X.h"
 
 BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString OperatingPoint, int SystematicIndex, TString FastSimDataset, int Seed) {
 
