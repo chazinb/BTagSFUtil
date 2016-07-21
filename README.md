@@ -33,7 +33,7 @@ Class Usage:
    
  - To get the SF for a given jet:
 
-      GetJetSF->IsTagged(JetFlavor, JetPt, JetEta);
+      BTagSF->GetJetSF(JetFlavor, JetPt, JetEta);
 
  - For applying the SF to a jet according to the "flip a coin" method:
 

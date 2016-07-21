@@ -1,20 +1,35 @@
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
 #include "BTagSFUtil.h"
-#include "BTagCalibrationStandalone.cc"
-#include "CampaignInfo/Run2015_74X.h"
+#include "BTagCalibrationStandalone.cpp"
+
+// Jamboree 2015
+//#include "CampaignInfo/Run2015_74X.h"
+//#include "BTagEfficiencies/Summer15TTbar.C"
+
+// Moriond 2015
+//#include "CampaignInfo/Run2015_76X.h"
+//#include "BTagEfficiencies/Fall15TTbar.C"
+
+// ICHEP 2016
+#include "CampaignInfo/Run2016_80X.h"
+#include "BTagEfficiencies/Spring16TTbar.C"
 
 BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString OperatingPoint, int SystematicIndex, TString FastSimDataset, int Seed) {
 
   rand_ = new TRandom3(Seed);
 
-  string CSVFileName = "../BTagSFUtil/BTagScaleFactors/" + CampaignName + "/" + BTagAlgorithm + ".csv";
-  BTagCalibration calib(BTagAlgorithm, CSVFileName);
+  string CSVFileName = "../BTagSFUtil/BTagScaleFactors/" + CampaignName + "/" + BTagAlgorithm + CSVFileFlag + ".csv";
+  BTagCalibrationSA calib(BTagAlgorithm, CSVFileName);
 
-  string SystematicFlagBC = "central";
-  string SystematicFlagL  = "central";
+  SystematicFlagB  = "central";
+  SystematicFlagC  = "central";
+  SystematicFlagL  = "central";
   if (abs(SystematicIndex)<10) {
-    if (SystematicIndex==-1 || SystematicIndex==-2) SystematicFlagBC = "down";
-    if (SystematicIndex==+1 || SystematicIndex==+2) SystematicFlagBC = "up";
+    if (SystematicIndex==-1) SystematicFlagB = "down";
+    if (SystematicIndex==+1) SystematicFlagB = "up";
+    if (SystematicIndex==-2) cout << "BTagSFUtil: SFc not available yet";
+    if (SystematicIndex==+2) cout << "BTagSFUtil: SFc not available yet";
+    SystematicFlagC = SystematicFlagB;
     if (SystematicIndex==-3) SystematicFlagL = "down";
     if (SystematicIndex==+3) SystematicFlagL = "up";
   }
@@ -33,26 +48,20 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
   if (OperatingPoint=="Loose")  {
     TaggerOP += "L";
     TaggerCut = TaggerWP[iTagger][0];
-    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, LightMeasurementType,          SystematicFlagL);
-    reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, LightMeasurementType, "central");
+    reader = new BTagCalibrationReaderSA(BTagEntrySA::OP_LOOSE, "central", {"up", "down"});
   } else if (OperatingPoint=="Medium")  {
     TaggerOP += "M";
     TaggerCut = TaggerWP[iTagger][1];
-    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, LightMeasurementType, SystematicFlagL);
-    reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, LightMeasurementType, "central");
+    reader = new BTagCalibrationReaderSA(BTagEntrySA::OP_MEDIUM, "central", {"up", "down"});
   } else if (OperatingPoint=="Tight")  {
     TaggerOP += "T";
     TaggerCut = TaggerWP[iTagger][2];
-    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, SystematicFlagBC);
-    reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, LightMeasurementType, SystematicFlagL);
-    reader_bc_central = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, MeasurementType, "central");
-    reader_l_central  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, LightMeasurementType, "central");
-  } 
-
+    reader = new BTagCalibrationReaderSA(BTagEntrySA::OP_TIGHT, "central", {"up", "down"});
+  }
+  reader->load(calib, BTagEntrySA::FLAV_B,    MeasurementType); 
+  reader->load(calib, BTagEntrySA::FLAV_C,    MeasurementType); 
+  reader->load(calib, BTagEntrySA::FLAV_UDSG, LightMeasurementType); 
+  
   if (TaggerCut==-999.) 
     cout << " " << TaggerName << " not supported for " << OperatingPoint << " WP" << endl;
 
@@ -69,12 +78,12 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
     for (int idt = 0; idt<nFastSimDatasets; idt++)
       if (FastSimDataset==FastSimDatasetName[idt]) FastSimName = FastSimDatasetName[idt];
     
-    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + CampaignName + "/" + BTagAlgorithm + FastSimName + ".csv";
-    BTagCalibration fastsimcalib(BTagAlgorithm, FastSimCSVFileName);
+    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + CampaignName + "/" + BTagAlgorithm + FastSimName + CSVFileFlag + ".csv";
+    BTagCalibrationSA fastsimcalib(BTagAlgorithm, FastSimCSVFileName);
     
-    string FastSimSystematicFlagB = "central";
-    string FastSimSystematicFlagC = "central";
-    string FastSimSystematicFlagL = "central";
+    FastSimSystematicFlagB = "central";
+    FastSimSystematicFlagC = "central";
+    FastSimSystematicFlagL = "central";
     if (abs(SystematicIndex)>=11) {
       if (SystematicIndex==-11) FastSimSystematicFlagB = "down";
       if (SystematicIndex==+11) FastSimSystematicFlagB = "up";
@@ -84,22 +93,17 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
       if (SystematicIndex==+13) FastSimSystematicFlagL = "up";
     }
 
+    
     if (OperatingPoint=="Loose")  {
-      fastsim_b = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_LOOSE, "fastsim", FastSimSystematicFlagB);
-      fastsim_c = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_LOOSE, "fastsim", FastSimSystematicFlagC);
-      fastsim_l = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_LOOSE, "fastsim", FastSimSystematicFlagL);
-      fastsim_central = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_LOOSE, "fastsim", "central");
+      fastsimreader = new BTagCalibrationReaderSA(BTagEntrySA::OP_LOOSE,  "central", {"up", "down"});
     } else if (OperatingPoint=="Medium")  {
-      fastsim_b = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_MEDIUM, "fastsim", FastSimSystematicFlagB);
-      fastsim_c = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_MEDIUM, "fastsim", FastSimSystematicFlagC);
-      fastsim_l = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_MEDIUM, "fastsim", FastSimSystematicFlagL);
-      fastsim_central = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_MEDIUM, "fastsim", "central");
+      fastsimreader = new BTagCalibrationReaderSA(BTagEntrySA::OP_MEDIUM, "central", {"up", "down"});
     } else if (OperatingPoint=="Tight")  {
-      fastsim_b = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_TIGHT, "fastsim", FastSimSystematicFlagB);
-      fastsim_c = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_TIGHT, "fastsim", FastSimSystematicFlagC);
-      fastsim_l = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_TIGHT, "fastsim", FastSimSystematicFlagL);
-      fastsim_central = new BTagCalibrationReader(&fastsimcalib, BTagEntry::OP_TIGHT, "fastsim", "central");
+      fastsimreader = new BTagCalibrationReaderSA(BTagEntrySA::OP_TIGHT,  "central", {"up", "down"});
     }
+    fastsimreader->load(fastsimcalib, BTagEntrySA::FLAV_B,    "fastsim"); 
+    fastsimreader->load(fastsimcalib, BTagEntrySA::FLAV_C,    "fastsim"); 
+    fastsimreader->load(fastsimcalib, BTagEntrySA::FLAV_UDSG, "fastsim"); 
     
   }
   
@@ -115,81 +119,15 @@ float BTagSFUtil::FastSimCorrectionFactor(int JetFlavor, float JetPt, float JetE
 
   float CF = 1.;
 
-  if (JetEta>2.4) {
-
-    cout << "FastSim CF not supported for jet eta>2.4" << endl;
-    return 0.;
-
-  }
-
-  if (JetPt<AbsoluteMinJetPt) {
-
-    cout << "FastSim CF not supported for jet Pt<" << AbsoluteMinJetPt << endl;
-    return 0.;
-
-  }
-
   float ThisJetPt = JetPt;
 
-  //int JetFlavorFlag = 2;
-  //if (abs(JetFlavor)==4) JetFlavorFlag = 1;
-  //else if (abs(JetFlavor)==5) JetFlavorFlag = 0;
-
-  if (JetPt<MinJetPtFastSim)
-    ThisJetPt = MinJetPtFastSim;
-
-  if (JetPt>=MaxJetPtFastSim)
-    ThisJetPt = MaxJetPtFastSim - 0.01;
-
   if (abs(JetFlavor)==5) 
-    CF = fastsim_b->evaluate(BTagEntry::FLAV_B, JetEta, ThisJetPt, -1.);
+    CF = fastsimreader->eval_auto_bounds(FastSimSystematicFlagB, BTagEntrySA::FLAV_B, JetEta, JetPt);
   else if (abs(JetFlavor)==4) 
-    CF = fastsim_c->evaluate(BTagEntry::FLAV_C, JetEta, ThisJetPt, -1.);
+    CF = fastsimreader->eval_auto_bounds(FastSimSystematicFlagC, BTagEntrySA::FLAV_C, JetEta, JetPt);
   else 
-    CF = fastsim_l->evaluate(BTagEntry::FLAV_UDSG, JetEta, ThisJetPt, -1.);
-
-  if (ThisJetPt!=JetPt) {
-
-    float CF_Central;
-    if (abs(JetFlavor)==5) 
-      CF_Central = fastsim_central->evaluate(BTagEntry::FLAV_B, JetEta, ThisJetPt, -1.);
-    else if (abs(JetFlavor)==4) 
-      CF_Central = fastsim_central->evaluate(BTagEntry::FLAV_C, JetEta, ThisJetPt, -1.);
-    else 
-      CF_Central = fastsim_central->evaluate(BTagEntry::FLAV_UDSG, JetEta, ThisJetPt, -1.);
-    
-    if (CF!=CF_Central) 
-      CF += (CF - CF_Central);
-    
-  } 
+    CF = fastsimreader->eval_auto_bounds(FastSimSystematicFlagL, BTagEntrySA::FLAV_UDSG, JetEta, JetPt);
  
-  /* Run1 style
-  if (JetPt<FastSimPtBinEdge[0]) { cout << "CF is not available for jet pt<" << FastSimPtBinEdge[0] << " GeV" << endl; return -1.; }
-  if (fabs(JetEta)>2.4) { cout << "CF is not available for jet |eta|>2.4" << endl; return -1.; }
-
-  int JetFlavorFlag = 2;
-  if (abs(JetFlavor)==4) JetFlavorFlag = 1;
-  else if (abs(JetFlavor)==5) JetFlavorFlag = 0;
-
-  int ThisFastSimSystematic = 0;
-  if (abs(FastSimSystematic)==JetFlavorFlag+1) 
-    ThisFastSimSystematic = FastSimSystematic/abs(FastSimSystematic);
- 
-  int JetPtBin = -1;
-  for (int ptbin = 0; ptbin<nFastSimPtBins; ptbin++) 
-    if (JetPt>=FastSimPtBinEdge[ptbin]) JetPtBin++;
-
-  if (JetPt>=FastSimPtBinEdge[nFastSimPtBins]) ThisFastSimSystematic *= 2;
-
-  int JetEtaBin = -1;  
-  for (int etabin = 0; etabin<nFastSimEtaBins[JetFlavorFlag]; etabin++) 
-    if (fabs(JetEta)>=FastSimEtaBinEdge[etabin][JetFlavorFlag]) JetEtaBin++;
-    
-  CF = FastSimCF[JetPtBin][JetEtaBin][JetFlavorFlag] + ThisFastSimSystematic*FastSimCF_error[JetPtBin][JetEtaBin][JetFlavorFlag];
-
-  if (CF<0.) CF = 0.; // Effect of large uncertainties on light CFs!
-
-  */
 
   return CF;
 
@@ -205,7 +143,7 @@ float BTagSFUtil::JetTagEfficiency(int JetFlavor, float JetPt, float JetEta) {
 
 float BTagSFUtil::GetJetSF(int JetFlavor, float JetPt, float JetEta) {
 
-  if (JetEta>2.4) {
+  if (fabs(JetEta)>2.4) {
 
     cout << "SF not supported for jet eta>2.4" << endl;
     return 0.;
@@ -221,39 +159,12 @@ float BTagSFUtil::GetJetSF(int JetFlavor, float JetPt, float JetEta) {
     
   float Btag_SF;
 
-  float ThisJetPt = JetPt;
-
-  int JetFlavorFlag = 2;
-  if (abs(JetFlavor)==4) JetFlavorFlag = 1;
-  else if (abs(JetFlavor)==5) JetFlavorFlag = 0;
- 
-  if (JetPt<MinJetPt[JetFlavorFlag][iTagger])
-    ThisJetPt = MinJetPt[JetFlavorFlag][iTagger];
-
-  if (JetPt>=MaxJetPt[JetFlavorFlag][iTagger])
-    ThisJetPt = MaxJetPt[JetFlavorFlag][iTagger] - 0.01;
-
   if (abs(JetFlavor)==5) 
-    Btag_SF = reader_bc->evaluate(BTagEntry::FLAV_B, JetEta, ThisJetPt, -1.);
+    Btag_SF = reader->eval_auto_bounds(SystematicFlagB, BTagEntrySA::FLAV_B, JetEta, JetPt);
   else if (abs(JetFlavor)==4) 
-    Btag_SF = reader_bc->evaluate(BTagEntry::FLAV_C, JetEta, ThisJetPt, -1.);
+    Btag_SF = reader->eval_auto_bounds(SystematicFlagC, BTagEntrySA::FLAV_C, JetEta, JetPt);
   else 
-    Btag_SF = reader_l->evaluate(BTagEntry::FLAV_UDSG, JetEta, ThisJetPt, -1.);
-
-  if (ThisJetPt!=JetPt) {
-
-    float Btag_SF_Central;
-    if (abs(JetFlavor)==5) 
-      Btag_SF_Central = reader_bc_central->evaluate(BTagEntry::FLAV_B, JetEta, ThisJetPt, -1.);
-    else if (abs(JetFlavor)==4) 
-      Btag_SF_Central = reader_bc_central->evaluate(BTagEntry::FLAV_C, JetEta, ThisJetPt, -1.);
-    else 
-      Btag_SF_Central = reader_l_central->evaluate(BTagEntry::FLAV_UDSG, JetEta, ThisJetPt, -1.);
-    
-    if (Btag_SF!=Btag_SF_Central) 
-      Btag_SF += (Btag_SF - Btag_SF_Central);
-    
-  }
+    Btag_SF = reader->eval_auto_bounds(SystematicFlagL, BTagEntrySA::FLAV_UDSG, JetEta, JetPt);
   
   if (IsFastSimDataset)
     Btag_SF *= FastSimCorrectionFactor(JetFlavor, JetPt, JetEta);

@@ -1,5 +1,5 @@
-#ifndef BTagEntry_H
-#define BTagEntry_H
+#ifndef BTagEntrySA_H
+#define BTagEntrySA_H
 
 /**
  *
@@ -20,7 +20,7 @@
 #include <TH1.h>
 
 
-class BTagEntry
+class BTagEntrySA
 {
 public:
   enum OperatingPoint {
@@ -62,12 +62,12 @@ public:
 
   };
 
-  BTagEntry() {}
-  BTagEntry(const std::string &csvLine);
-  BTagEntry(const std::string &func, Parameters p);
-  BTagEntry(const TF1* func, Parameters p);
-  BTagEntry(const TH1* histo, Parameters p);
-  ~BTagEntry() {}
+  BTagEntrySA() {}
+  BTagEntrySA(const std::string &csvLine);
+  BTagEntrySA(const std::string &func, Parameters p);
+  BTagEntrySA(const TF1* func, Parameters p);
+  BTagEntrySA(const TH1* histo, Parameters p);
+  ~BTagEntrySA() {}
   static std::string makeCSVHeader();
   std::string makeCSVLine() const;
   static std::string trimStr(std::string str);
@@ -78,17 +78,17 @@ public:
 
 };
 
-#endif  // BTagEntry_H
+#endif  // BTagEntrySA_H
 
 
-#ifndef BTagCalibration_H
-#define BTagCalibration_H
+#ifndef BTagCalibrationSA_H
+#define BTagCalibrationSA_H
 
 /**
- * BTagCalibration
+ * BTagCalibrationSA
  *
  * The 'hierarchy' of stored information is this:
- * - by tagger (BTagCalibration)
+ * - by tagger (BTagCalibrationSA)
  *   - by operating point or reshape bin
  *     - by jet parton flavor
  *       - by type of measurement
@@ -105,18 +105,18 @@ public:
 #include <ostream>
 
 
-class BTagCalibration
+class BTagCalibrationSA
 {
 public:
-  BTagCalibration() {}
-  BTagCalibration(const std::string &tagger);
-  BTagCalibration(const std::string &tagger, const std::string &filename);
-  ~BTagCalibration() {}
+  BTagCalibrationSA() {}
+  BTagCalibrationSA(const std::string &tagger);
+  BTagCalibrationSA(const std::string &tagger, const std::string &filename);
+  ~BTagCalibrationSA() {}
 
   std::string tagger() const {return tagger_;}
 
-  void addEntry(const BTagEntry &entry);
-  const std::vector<BTagEntry>& getEntries(const BTagEntry::Parameters &par) const;
+  void addEntry(const BTagEntrySA &entry);
+  const std::vector<BTagEntrySA>& getEntries(const BTagEntrySA::Parameters &par) const;
 
   void readCSV(std::istream &s);
   void readCSV(const std::string &s);
@@ -124,65 +124,68 @@ public:
   std::string makeCSV() const;
 
 protected:
-  static std::string token(const BTagEntry::Parameters &par);
+  static std::string token(const BTagEntrySA::Parameters &par);
 
   std::string tagger_;
-  std::map<std::string, std::vector<BTagEntry> > data_;
+  std::map<std::string, std::vector<BTagEntrySA> > data_;
 
 };
 
-#endif  // BTagCalibration_H
+#endif  // BTagCalibrationSA_H
 
 
-#ifndef BTagCalibrationReader_H
-#define BTagCalibrationReader_H
+#ifndef BTagCalibrationReaderSA_H
+#define BTagCalibrationReaderSA_H
 
 /**
- * BTagCalibrationReader
+ * BTagCalibrationReaderSA
  *
- * Helper class to pull out a specific set of BTagEntry's out of a
+ * Helper class to pull out a specific set of BTagEntrySA's out of a
  * BTagCalibration. TF1 functions are set up at initialization time.
  *
  ************************************************************/
 
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
-#include <TF1.h>
 
 
-class BTagCalibrationReader
+
+class BTagCalibrationReaderSA
 {
 public:
-  BTagCalibrationReader() {}
-  BTagCalibrationReader(const BTagCalibration* c,
-                        BTagEntry::OperatingPoint op,
-                        std::string measurementType="comb",
-                        std::string sysType="central");
-  ~BTagCalibrationReader() {}
+  class BTagCalibrationReaderImplSA;
 
-  double evaluate(BTagEntry::JetFlavor jf,
+  BTagCalibrationReaderSA() {}
+  BTagCalibrationReaderSA(BTagEntrySA::OperatingPoint op,
+                        const std::string & sysType="central",
+                        const std::vector<std::string> & otherSysTypes={});
+
+  void load(const BTagCalibrationSA & c,
+            BTagEntrySA::JetFlavor jf,
+            const std::string & measurementType="comb");
+
+  double eval(BTagEntrySA::JetFlavor jf,
               float eta,
               float pt,
               float discr=0.) const;
 
-//protected:
-  struct TmpEntry {
-    float etaMin;
-    float etaMax;
-    float ptMin;
-    float ptMax;
-    float discrMin;
-    float discrMax;
-    TF1 func;
-  };
-  void setupTmpData(const BTagCalibration* c);
+  double eval_auto_bounds(const std::string & sys,
+                          BTagEntrySA::JetFlavor jf,
+                          float eta,
+                          float pt,
+                          float discr=0.) const;
 
-  BTagEntry::Parameters params;
-  std::map<BTagEntry::JetFlavor, std::vector<TmpEntry> > tmpData_;
-  std::vector<bool> useAbsEta;
+  std::pair<float, float> min_max_pt(BTagEntrySA::JetFlavor jf,
+                                     float eta,
+                                     float discr=0.) const;
+
+protected:
+  std::shared_ptr<BTagCalibrationReaderImplSA> pimpl;
 };
 
+
 #endif  // BTagCalibrationReader_H
+
+
 
 

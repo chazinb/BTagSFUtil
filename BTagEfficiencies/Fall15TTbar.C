@@ -1,4 +1,4 @@
-/* These Efficiencies have been derived for Summer12 ttbar events and should
+/* These Efficiencies have been derived for Fall15 ttbar events and should
 be used only for the same MC samples or for events with similar topology */
 
 float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {

@@ -18,8 +18,10 @@ class BTagSFUtil{
 
  private:
 
-  BTagCalibrationReader *reader_bc, *reader_l, *reader_bc_central, *reader_l_central;
-  BTagCalibrationReader *fastsim_b, *fastsim_c, *fastsim_l, *fastsim_central;
+  BTagCalibrationReaderSA *reader, *fastsimreader;
+
+  string SystematicFlagB, SystematicFlagC, SystematicFlagL;
+  string FastSimSystematicFlagB, FastSimSystematicFlagC, FastSimSystematicFlagL;
 
   void GetBTagPayload(TString BTagAlgorithm, TString DataPeriod);
   void GetFastSimPayload(TString BTagAlgorithm, TString FastSimDataset);
