@@ -184,6 +184,8 @@ float BTagSFUtil::TagEfficiencyB(float JetPt, float JetEta) {
 
 float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 
+  if (JetPt>=300.) JetPt = 299.;
+
   if (TaggerOP=="cMVAv2L") {
 
     //efficienciesMC_CMVA[('c','L')] = [
@@ -362,6 +364,8 @@ float BTagSFUtil::TagEfficiencyC(float JetPt, float JetEta) {
 }
 
 float BTagSFUtil::TagEfficiencyLight(float JetPt, float JetEta) {
+
+  if (JetPt>=300.) JetPt = 299.;
 
   if (TaggerOP=="cMVAv2L") {
 
