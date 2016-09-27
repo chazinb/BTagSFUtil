@@ -78,7 +78,7 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
     for (int idt = 0; idt<nFastSimDatasets; idt++)
       if (FastSimDataset==FastSimDatasetName[idt]) FastSimName = FastSimDatasetName[idt];
     
-    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + CampaignName + "/" + BTagAlgorithm + FastSimName + CSVFileFlag + ".csv";
+    string FastSimCSVFileName = "../BTagSFUtil/FastSimCorrectionFactors/" + CampaignName + "/" + BTagAlgorithm + FastSimName + FastSimCSVFileFlag + ".csv";
     BTagCalibrationSA fastsimcalib(BTagAlgorithm, FastSimCSVFileName);
     
     FastSimSystematicFlagB = "central";
