@@ -11,8 +11,12 @@
 //#include "BTagEfficiencies/Fall15TTbar.C"
 
 // ICHEP 2016
-#include "CampaignInfo/Run2016_80X.h"
-#include "BTagEfficiencies/Spring16TTbar.C"
+//#include "CampaignInfo/Run2016_80X.h"
+//#include "BTagEfficiencies/Spring16TTbar.C"
+
+// Moriond 2017
+#include "CampaignInfo/Run2016_80X_ReReco.h"
+#include "BTagEfficiencies/Summer16TTbar.C"
 
 BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString OperatingPoint, int SystematicIndex, TString FastSimDataset, int Seed) {
 
