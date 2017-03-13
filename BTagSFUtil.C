@@ -1,3 +1,4 @@
+
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
 #include "BTagSFUtil.h"
 #include "BTagCalibrationStandalone.cpp"
@@ -48,7 +49,7 @@ BTagSFUtil::BTagSFUtil(string MeasurementType, string BTagAlgorithm, TString Ope
 
   if (iTagger<0) 
     cout << " " << TaggerName << " not supported for " << CampaignName << endl;
-
+  
   if (OperatingPoint=="Loose")  {
     TaggerOP += "L";
     TaggerCut = TaggerWP[iTagger][0];
